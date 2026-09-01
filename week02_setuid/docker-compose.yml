@@ -1,0 +1,13 @@
+services:
+  # [소프트웨어및시스템보안] 주차별 개별 실습 컨테이너 (01_setuid)
+  ctf-setuid:
+    build:
+      context: ./01_setuid
+      dockerfile: Dockerfile
+    platform: linux/amd64
+    environment:
+      - STUDENT_ID=${STUDENT_ID:-default}
+    container_name: student_01_setuid
+    ports:
+      - "2222:22"
+    restart: unless-stopped
