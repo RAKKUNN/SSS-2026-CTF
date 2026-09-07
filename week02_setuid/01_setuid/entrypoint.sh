@@ -11,10 +11,8 @@ make_flag() {
 
 echo "$(make_flag setuid_path_hijack_dash_privdrop_bypass)" > /root/flag_main.txt
 echo "$(make_flag setuid_fd_leak_env_integrity_master)" > /root/flag_hidden.txt
-echo "FLAG{setuid_intro_practice}" > /root/flag_intro.txt
-echo "FLAG{setuid_basic_practice}" > /root/flag_basic.txt
 
-chmod 400 /root/flag_main.txt /root/flag_hidden.txt /root/flag_intro.txt /root/flag_basic.txt
-chown root:root /root/flag_main.txt /root/flag_hidden.txt /root/flag_intro.txt /root/flag_basic.txt
+chmod 400 /root/flag_main.txt /root/flag_hidden.txt
+chown root:root /root/flag_main.txt /root/flag_hidden.txt
 
 exec /usr/sbin/sshd -D

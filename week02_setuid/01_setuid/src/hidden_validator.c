@@ -20,10 +20,7 @@ static inline int setresuid(uid_t r, uid_t e, uid_t s) {
 void print_hidden_flag() {
     FILE *fp = fopen("/root/flag_hidden.txt", "r");
     if (!fp) {
-        fp = fopen("flag_hidden.txt", "r");
-    }
-    if (!fp) {
-        printf("[!] Error: flag_hidden.txt not found or unreadable.\n");
+        printf("[!] Error: /root/flag_hidden.txt not found or unreadable.\n");
         return;
     }
     char flag[128];
