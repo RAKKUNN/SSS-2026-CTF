@@ -14,30 +14,36 @@ Set-UID 비트의 가장 기본적인 동작 원리를 이해하는 웜업(Warmu
 
 ---
 
-## 3. 실습 방법 (★ 본인 PC = 로컬 연습, 채점 컨테이너가 아님)
+## 3. 실습 방법 (★ 본인 호스트 = 로컬 연습, 채점 컨테이너 아님)
 
-> 이 레벨은 **본인 호스트(WSL2 / Linux / macOS)** 에서 진행하는 **로컬 연습**입니다.
-> 채점용 CTF 컨테이너의 guest 계정은 `sudo` 권한이 없어 Set-UID 비트를 직접 설정할 수 없습니다.
-> 아래처럼 **연습 전용 보호 파일**을 만들어 Set-UID 원리만 체험하세요.
+> 채점 컨테이너의 guest 는 `sudo` 가 없어 Set-UID 설정을 못 합니다. 이 레벨은 **본인 PC(WSL2 / Linux / macOS)** 에서 진행하세요.
 
+### 공통 1단계 — 빌드 + Set-UID 설정
 ```bash
-# 1. 바이너리 빌드
-make
-
-# 2. 연습 전용 보호 파일 생성 (root 소유, 일반 사용자 읽기 불가)
-sudo sh -c 'echo "FLAG{setuid_intro_practice}" > /opt/secret_note.txt'
-sudo chmod 400 /opt/secret_note.txt          # 소유자(root)만 읽기
-cat /opt/secret_note.txt                       # → Permission denied (정상)
-
-# 3. Set-UID 비트 설정 (관리자 권한 필요)
+make                                 # suid_cat 빌드
 sudo chown root:root suid_cat
-sudo chmod 4755 suid_cat
-
-# 4. 일반 사용자 계정으로 보호 파일 읽기 (EUID 승격 확인)
-./suid_cat /opt/secret_note.txt
+sudo chmod 4755 suid_cat             # 맨 앞 '4' = Set-UID 비트
+ls -l suid_cat                       # -rwsr-xr-x (s 비트) 확인
 ```
 
----
+### 방법 A — /etc/shadow 읽기  (Linux / WSL2 권장 · 준비 불필요)
+```bash
+cat /etc/shadow                      # → Permission denied (일반 권한 불가)
+./suid_cat /etc/shadow               # → EUID=0 으로 비밀번호 해시가 읽힘!
+```
+`/etc/shadow`(권한 0640 root:shadow)는 실제 비밀번호 해시 저장소라 일반 사용자는 못 읽습니다. Set-UID 로 EUID 가 root 가 되어 읽히는 것을 확인하세요.
+
+### 방법 B — 직접 보호 파일 생성  (macOS 등 /etc/shadow 없는 환경)
+```bash
+sudo sh -c 'echo "FLAG{setuid_intro_practice}" > /opt/secret_note.txt'
+sudo chmod 400 /opt/secret_note.txt
+cat /opt/secret_note.txt             # → Permission denied
+./suid_cat /opt/secret_note.txt      # → EUID=0 으로 읽힘!
+```
+> macOS 에는 `/etc/shadow` 가 없습니다. 방법 B 를 쓰거나, WSL2/Linux/컨테이너에서 방법 A 를 진행하세요.
+
+### 완료 기준
+`cat` 은 거부되는데 `./suid_cat` 으로는 읽히면 성공입니다 — EUID 승격 원리 체험 완료.
 
 ## ⚠️ 주의 (채점 무결성)
 `suid_cat` 은 **임의의 파일을 root 권한으로 읽어주는** 도구입니다. 따라서 이 바이너리를

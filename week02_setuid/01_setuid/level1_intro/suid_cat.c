@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
 
     if (argc < 2) {
         printf("Usage: %s <filepath>\n", argv[0]);
-        printf("Example: %s /root/flag_intro.txt\n", argv[0]);
+        printf("Example: %s /etc/shadow\n", argv[0]);
         return 1;
     }
 
