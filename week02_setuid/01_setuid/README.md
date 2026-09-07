@@ -2,7 +2,7 @@
 
 ## 1. 문제 정보 (Challenge Info)
 - **분야**: Set-UID 권한 상승 (Privilege Escalation)
-- **난이도**: `pwnable.kr` Toddler's Bottle 급 (보통/상)
+- **난이도**: `pwnable.kr` Toddler's Bottle 급 (입문/보통) — C 코드 작성 없이 bash로 해결 가능
 - **접속 정보**: `ssh guest@<HOST> -p 2222` (PW: `guest`)
 - **제공 파일**: `secure_logger.c`, `hidden_validator.c` (C 소스코드)
 
@@ -13,7 +13,7 @@
 일반 계정 `guest`로 접속하여 권한 상승 취약점을 분석하고 2개의 플래그를 획득하세요.
 
 1. **Main Flag**: `secure_logger`의 환경변수 및 명령 실행 결함을 악용하여 root 권한으로 `/root/flag_main.txt`를 탈취합니다.
-2. **Hidden Flag**: `hidden_validator`의 환경 변수 및 파일 디스크립터(FD) 무결성 조건을 충족하는 익스플로잇 런처를 작성하여 `/root/flag_hidden.txt`를 획득합니다.
+2. **Hidden Flag**: `hidden_validator`가 검사하는 3가지 조건(EUID·환경변수·FD 3 토큰)을 모두 만족시켜 `/root/flag_hidden.txt`를 획득합니다. **C 코드 없이 bash 리다이렉션만으로도 해결됩니다.**
 
 ---
 
@@ -29,7 +29,13 @@
   1. `geteuid() == 0` (Set-UID 비트 활성화)
   2. `getenv("SECURE_KEY") == "SYSLAB_SETUID_VERIFICATION_2026"`
   3. `read(3, buf, ...)` -> 파일 디스크립터 3번에 `"0xCAFE_BABE_ROOT\n"` 토큰 전달
-- 유닉스 프로세스 생성 메커니즘(`pipe()`, `dup2()`, `fork()`, `execve()`)을 이해하고 자식 프로세스로 열린 파일 디스크립터와 환경변수를 온전히 전달하는 런처 프로그램을 작성해야 합니다.
+- **해결 (C 코드 불필요)**: 위 3가지 조건을 bash로 만족시킬 수 있습니다. 파일 디스크립터 3번은 `명령 3< 파일` 리다이렉션으로 연결합니다.
+  ```bash
+  printf '0xCAFE_BABE_ROOT\n' > /tmp/tok        # 위 3번 조건의 토큰
+  export SECURE_KEY=SYSLAB_SETUID_VERIFICATION_2026   # 위 2번 조건
+  /home/guest/hidden_validator 3< /tmp/tok       # FD 3 으로 파일 연결
+  ```
+- (심화·선택) 원리를 더 파고 싶다면 `pipe()`+`dup2()`+`execve()`로 C 런처를 작성해도 됩니다. **단, 필수는 아닙니다.**
 
 ---
 
@@ -43,6 +49,6 @@
 일반 사용자 계정에서 PATH 환경변수를 가로채어 root 쉘을 얻거나 /root/flag_main.txt를 읽는 익스플로잇 셸 스크립트를 작성해줘."
 
 [프롬프트 예시 2 - Hidden Flag]
-"Set-UID 바이너리(hidden_validator)가 실행될 때 getenv("SECURE_KEY") 값과 파일 디스크립터 3(FD 3)번 파이프로부터 특정 토큰을 검증합니다.
-C 언어로 pipe()와 dup2(), execve()를 사용하여 이 조건을 만족시키며 hidden_validator를 실행하는 익스플로잇 코드를 작성해줘."
+"Set-UID 바이너리(hidden_validator)가 SECURE_KEY 환경변수와 파일 디스크립터 3번의 토큰을 검증합니다.
+bash 리다이렉션(명령 3< 파일)과 환경변수 설정만으로 이 조건들을 만족시켜 실행하는 방법을 알려줘. (C 코드 없이)"
 ```
