@@ -7,15 +7,27 @@
 
 ## 0. 실행 환경 (가장 중요)
 
-- **반드시 Linux amd64(x86_64) 환경에서** 빌드·실행하세요: **SEED 2.0 VM(Ubuntu 22.04)** 또는 `platform: linux/amd64` 컨테이너.
-- ⚠️ **Apple Silicon(M1~) Mac에서 `gcc`로 그냥 빌드하면 arm64 바이너리**가 만들어져, 교안의 x86_64 스택 배치(오프셋·가젯)가 **전혀 맞지 않습니다.** Level 3 컨테이너는 compose에 `platform: linux/amd64`가 지정돼 있어 안전하지만, **Level 1·2를 Mac 터미널에서 직접 빌드하지 마세요.** SEED VM에서 하세요.
-- 분석 도구(`gdb`, `gef`, `checksec`)는 **SEED VM에 설치**되어 있습니다. (Level 3 서비스 컨테이너에는 포함돼 있지 않습니다.)
+- **반드시 Linux amd64(x86_64) ELF 환경에서** Level 1·2를 빌드·실행하세요.
+- ⚠️ **맥에서 그냥 `gcc`/`make` 하면 안 됩니다.** 애플 실리콘은 **arm64**, 인텔 맥은 x86_64여도 리눅스 ELF가 아니라 **Mach-O**가 만들어져서, 교안의 스택 배치·오프셋·가젯이 **전혀 맞지 않습니다.** (예: 같은 Level 1이 리눅스 amd64에선 `'A'*20`으로 안 뚫리는데 맥 arm64에선 뚫립니다 — 배치가 다르기 때문.)
+- **채점 대상 Level 3**는 compose에 `platform: linux/amd64`가 지정돼 있어 **어느 OS에서도 동일하게** 동작하니 걱정하지 않아도 됩니다.
 
-빌드 툴 확인:
+**Level 1·2를 amd64에서 빌드하는 방법 (아래 중 하나):**
+
+1. **SEED 2.0 VM(Ubuntu 22.04) 또는 Windows WSL2(Ubuntu)** 안에서 그대로 `make` — `gdb`/`gef`/`checksec`이 이미 설치돼 있어 가장 편합니다.
+2. **VM이 없으면 amd64 컨테이너 한 줄** — Mac·Windows·Linux 어디서든 결과가 동일합니다:
+   ```bash
+   # 02_bof 폴더에서 실행
+   docker run --rm -it --platform linux/amd64 -v "$PWD":/w -w /w gcc:11 bash
+   # ↓ 컨테이너 안에서:
+   apt update && apt install -y gdb        # 분석 도구
+   cd level1_intro && make && ./bof_intro  # Level 1
+   cd ../level2_basic && make              # Level 2
+   ```
+
+빌드 전 환경 확인:
 ```bash
-uname -m           # x86_64 여야 함 (aarch64/arm64면 환경이 잘못됨)
-gcc --version       # Ubuntu 11.x
-which gdb checksec  # 분석 도구
+uname -m           # x86_64 여야 함 (aarch64/arm64면 환경이 잘못됨 → 위 컨테이너 사용)
+gcc --version      # Ubuntu 11.x
 ```
 
 ---
@@ -30,6 +42,26 @@ which gdb checksec  # 분석 도구
 4. **Level 3 Hidden** — 레지스터 인자 전달(ROP)과 스택 정렬로 확장 *(심화)*
 
 > **채점 대상은 Level 3 Main/Hidden** 입니다. Level 1·2는 로컬 연습(참여 점수)입니다.
+
+---
+
+## 1.5 리틀 엔디언 & 바이트 패킹 (초심자 필독)
+
+페이로드에 주소·숫자를 넣을 때 **값이 거꾸로 들어가는** 이유입니다. x86_64는 **리틀 엔디언** — 낮은 바이트를 낮은 주소에 먼저 저장하므로, 메모리에서는 사람이 읽는 순서와 반대로 보입니다.
+
+```text
+값(사람이 읽는 순서):   0x de ad be ef      (MSB ... LSB)
+메모리(낮은 주소 → 높은): ef be ad de         ← 뒤집힘!
+```
+```python
+>>> import struct
+>>> struct.pack("<I", 0xdeadbeef)   # "<"=리틀엔디언, I=uint32(4바이트)
+b'\xef\xbe\xad\xde'
+>>> struct.pack("<Q", 0x401176)     # Q=uint64(8바이트, 주소용)
+b'\x76\x11\x40\x00\x00\x00\x00\x00'
+```
+- **규칙**: 주소·정수 값은 항상 `pack()`으로 변환해 넣습니다(손으로 뒤집지 말 것). `'A'` 같은 패딩 문자는 그대로 둡니다.
+- 그래서 **Main은 4바이트 값 2개 → `p32`(`<I`) 두 번**, **Level 2·Hidden은 주소 → `p64`(`<Q`) 8바이트**로 넣습니다.
 
 ---
 
@@ -160,7 +192,7 @@ print(recv_until(s, ["FLAG{", "AUTH ERROR"]).decode(errors="ignore"))
 
 ---
 
-## 5. GDB 빠른 참조 (SEED VM)
+## 5. GDB 빠른 참조 (SEED VM 또는 amd64 컨테이너)
 
 ```text
 gdb -q ./bof_ret2win
@@ -191,7 +223,7 @@ checksec --file=./vault_guard         # 보호기법(Canary/NX/PIE)
 
 | 증상 | 원인 | 해결 |
 | --- | --- | --- |
-| 오프셋이 교안과 다름 | Apple Silicon에서 arm64로 빌드 | SEED VM / `linux/amd64` 에서 빌드 |
+| 오프셋이 교안과 다름 | 맥 네이티브 빌드(arm64/인텔 Mach-O) | SEED VM/WSL2 또는 `--platform linux/amd64 gcc:11` 컨테이너에서 빌드(0장) |
 | "주소 파싱 실패" | 서버 응답을 한 번에 못 받음 | `recv_until()`로 프롬프트까지 누적 수신 |
 | 입력이 잘린 듯함 | `read()`가 요청보다 적게 읽을 수 있음 | 한 번에 전송, 필요 시 반환 바이트 수 확인 |
 | Hidden에서 즉시 죽음(SIGSEGV) | 스택 16B 정렬 안 맞음 | `secret_vault` 앞에 단독 `ret` 가젯 1개 추가 |
