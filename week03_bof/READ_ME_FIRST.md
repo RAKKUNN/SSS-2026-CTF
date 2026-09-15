@@ -1,5 +1,7 @@
 # week03_bof 실습 실행 안내
 
+> 📘 **단계별 실습 방법·환경 설정·GDB·접근법은 [`LAB_GUIDE.md`](LAB_GUIDE.md) 를 먼저 읽으세요.**
+
 1. `.env.example` 를 `.env` 로 복사 후 본인 학번으로 수정
    ```
    cp .env.example .env
