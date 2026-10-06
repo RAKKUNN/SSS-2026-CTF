@@ -16,6 +16,7 @@
 | 3주차 | Buffer Overflow | TCP | `nc localhost 9001` |
 | 4주차 | BOF with Shellcode | TCP | `nc localhost 9002` |
 | 5주차 | Format String Bug | TCP | `nc localhost 9003` |
+| 6주차 | Return-to-libc / ROP | TCP | `nc localhost 9004` (Main) / `nc localhost 9005` (Hidden) |
 
 > 각 주차 패키지는 해당 주차가 되면 업로드됩니다.
 

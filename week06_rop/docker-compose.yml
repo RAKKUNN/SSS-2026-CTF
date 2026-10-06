@@ -1,0 +1,20 @@
+# [소프트웨어및시스템보안] 6주차 ROP — Main(9004) / Hidden(9005)
+services:
+  rop-main:
+    build: { context: ./05_rop, dockerfile: Dockerfile }
+    platform: linux/amd64
+    container_name: student_05_rop_main
+    environment:
+      - STUDENT_ID=${STUDENT_ID:-default}
+      - MODE=main
+    ports: [ "9004:9001" ]
+    restart: unless-stopped
+  rop-hidden:
+    build: { context: ./05_rop, dockerfile: Dockerfile }
+    platform: linux/amd64
+    container_name: student_05_rop_hidden
+    environment:
+      - STUDENT_ID=${STUDENT_ID:-default}
+      - MODE=hidden
+    ports: [ "9005:9001" ]
+    restart: unless-stopped
