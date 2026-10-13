@@ -1,0 +1,4 @@
+exploit/
+GUIDE_ATOZ.md
+*.o
+a.out

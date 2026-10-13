@@ -1,0 +1,12 @@
+services:
+  ctf-race:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    platform: linux/amd64
+    environment:
+      - STUDENT_ID=${STUDENT_ID:-default}
+    container_name: student_07_race
+    ports:
+      - "2223:22"
+    restart: unless-stopped
