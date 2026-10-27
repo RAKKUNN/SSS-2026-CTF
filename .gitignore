@@ -1,5 +1,9 @@
 .DS_Store
+~$*
 *.tmp
+*.log
+*.tar.gz
 .env
 __pycache__/
 *.pyc
+week09_optee/image/
