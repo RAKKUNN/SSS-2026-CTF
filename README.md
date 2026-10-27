@@ -28,14 +28,16 @@
 
 ### Part 1. 전반부 — 메모리 · 시스템 취약점 공략 (Docker CTF)
 
+> 2~7주차 실습 폴더는 [`전반부_2-7주차/`](./전반부_2-7주차) 안에 있습니다.
+
 | 주차 | 주제 | 서비스 | 접속 방법 | 가이드 폴더 | 배포 패키지 |
 | :---: | :--- | :---: | :--- | :---: | :---: |
-| **2주차** | Set-UID 권한 상승 | SSH | `ssh guest@localhost -p 2222` (PW: `guest`) | [`week02_setuid/`](./week02_setuid) | [`week02`](https://github.com/RAKKUNN/SSS-2026-CTF/releases/tag/week02) |
-| **3주차** | Buffer Overflow (BOF) | TCP | `nc localhost 9001` | [`week03_bof/`](./week03_bof) | [`week03`](https://github.com/RAKKUNN/SSS-2026-CTF/releases/tag/week03) |
-| **4주차** | BOF with Shellcode | TCP | `nc localhost 9002` | [`week04_shellcode/`](./week04_shellcode) | [`week04`](https://github.com/RAKKUNN/SSS-2026-CTF/releases/tag/week04) |
-| **5주차** | Format String Bug (FSB) | TCP | `nc localhost 9003` | [`week05_fsb/`](./week05_fsb) | [`week05`](https://github.com/RAKKUNN/SSS-2026-CTF/releases/tag/week05) |
-| **6주차** | Return-to-libc / ROP | TCP | `nc localhost 9004` (Main) / `9005` (Hidden) | [`week06_rop/`](./week06_rop) | [`week06`](https://github.com/RAKKUNN/SSS-2026-CTF/releases/tag/week06) |
-| **7주차** | Race Condition (TOCTOU) | SSH | `ssh guest@localhost -p 2223` (PW: `guest`) | [`week07_race/`](./week07_race) | [`week07`](https://github.com/RAKKUNN/SSS-2026-CTF/releases/tag/week07) |
+| **2주차** | Set-UID 권한 상승 | SSH | `ssh guest@localhost -p 2222` (PW: `guest`) | [`week02_setuid/`](./전반부_2-7주차/week02_setuid) | [`week02`](https://github.com/RAKKUNN/SSS-2026-CTF/releases/tag/week02) |
+| **3주차** | Buffer Overflow (BOF) | TCP | `nc localhost 9001` | [`week03_bof/`](./전반부_2-7주차/week03_bof) | [`week03`](https://github.com/RAKKUNN/SSS-2026-CTF/releases/tag/week03) |
+| **4주차** | BOF with Shellcode | TCP | `nc localhost 9002` | [`week04_shellcode/`](./전반부_2-7주차/week04_shellcode) | [`week04`](https://github.com/RAKKUNN/SSS-2026-CTF/releases/tag/week04) |
+| **5주차** | Format String Bug (FSB) | TCP | `nc localhost 9003` | [`week05_fsb/`](./전반부_2-7주차/week05_fsb) | [`week05`](https://github.com/RAKKUNN/SSS-2026-CTF/releases/tag/week05) |
+| **6주차** | Return-to-libc / ROP | TCP | `nc localhost 9004` (Main) / `9005` (Hidden) | [`week06_rop/`](./전반부_2-7주차/week06_rop) | [`week06`](https://github.com/RAKKUNN/SSS-2026-CTF/releases/tag/week06) |
+| **7주차** | Race Condition (TOCTOU) | SSH | `ssh guest@localhost -p 2223` (PW: `guest`) | [`week07_race/`](./전반부_2-7주차/week07_race) | [`week07`](https://github.com/RAKKUNN/SSS-2026-CTF/releases/tag/week07) |
 
 ---
 
@@ -68,7 +70,7 @@
 ## 🚀 전반부 (2~7주차) 실습 방법 — Docker CTF
 
 1. **사전 준비**: Docker Desktop 또는 OrbStack 설치
-2. **본인 학번 설정** — ⚠️ 필수
+2. **본인 학번 설정** — ⚠️ 필수 (해당 주차 폴더 안에서 실행, 예: `전반부_2-7주차/week02_setuid/`)
    ```bash
    cp .env.example .env
    # .env 파일을 열어 STUDENT_ID=<본인 학번> 으로 수정
