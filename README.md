@@ -18,7 +18,7 @@
 | 주차 | 주제 | 실행 환경 | 가이드 폴더 | 배포 패키지 (Release) |
 | :---: | :--- | :---: | :---: | :---: |
 | **9주차** | **실습 환경 구성 (QEMU & OP-TEE)** | QEMU (`aarch64`) + GDB | [`week09_optee/`](./week09_optee) | [📦 `week09` 다운로드](https://github.com/RAKKUNN/SSS-2026-CTF/releases/tag/week09) |
-| 10주차 | 디버깅 실습 (레지스터 · 브레이크포인트) | QEMU + GDB | *예정* | *9주차 공용 환경 사용* |
+| **10주차** | **디버깅 기초 & 보안 기법 관찰** | QEMU + GDB | [`week10_debug/`](./week10_debug) | *9주차 공용 환경 사용* |
 | 11주차 | Mitigations (Stack Canary · KASLR) | QEMU + GDB | *예정* | *9주차 공용 환경 사용* |
 | 12주차 | U-Boot 부트로더 디버깅 | QEMU + GDB | *예정* | *9주차 공용 환경 사용* |
 | 13주차 | Linux Kernel 디버깅 (MMU · Syscall) | QEMU + GDB | *예정* | *9주차 공용 환경 사용* |
